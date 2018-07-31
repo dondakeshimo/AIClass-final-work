@@ -21,13 +21,13 @@ from keras.utils import plot_model
 import data_loader
 
 
-EPOCHS = 100
+EPOCHS = 10
 BATCH_SIZE = 16
 
 
 class Foreigner_classifier():
-    def __init__(self, dir_path):
-        self.X, self.y = data_loader.main()
+    def __init__(self, data_dir):
+        self.X, self.y = data_loader.main(data_dir)
 
         self.X = self.X.astype('float32')
         self.X /= 255.0
@@ -121,7 +121,7 @@ def argparser():
                         nargs="?",
                         help="to load checkpoint h5 file path")
     parser.add_argument("-c", "--checkpoint_path",
-                        default="./data/save_test",
+                        default="./data/model",
                         nargs="?",
                         help="checkpoint h5 file path")
     parser.add_argument("-s", "--submission_path",
@@ -143,12 +143,12 @@ def time_measure(section, start, elapsed):
 def main():
     args = argparser()
     print(args)
-    cifar = Foreigner_classifier(args.input_dir_path)
-    cifar.make_model()
-    plot_model(cifar.model, to_file="./data/model.png", show_shapes=True)
-    cifar.train_model()
-    cifar.save_model(args.checkpoint_path)
-    cifar.evaluate()
+    foreign_clf = Foreigner_classifier(args.input_dir_path)
+    foreign_clf.make_model()
+    plot_model(foreign_clf.model, to_file="./data/model.png", show_shapes=True)
+    foreign_clf.train_model()
+    foreign_clf.save_model(args.checkpoint_path)
+    foreign_clf.evaluate()
     K.clear_session()
 
 
