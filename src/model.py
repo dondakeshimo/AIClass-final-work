@@ -5,7 +5,6 @@ import time
 from keras import backend as K
 from keras.callbacks import EarlyStopping
 from keras.callbacks import ModelCheckpoint
-from keras.datasets import cifar10
 from keras.layers import Activation
 from keras.layers import Conv2D
 from keras.layers import Dense
@@ -15,26 +14,21 @@ from keras.layers import MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import model_from_json
 from keras.models import Sequential
-from keras.utils.np_utils import to_categorical
 from keras.utils import plot_model
+
+import data_loader
 
 
 EPOCHS = 100
-BATCH_SIZE = 64
+BATCH_SIZE = 16
 
 
-class Cifar_classifier():
+class Foreigner_classifier():
     def __init__(self, dir_path):
-        (self.X_train, self.y_train), (self.X_test, self.y_test) = \
-            cifar10.load_data()
+        self.X, self.y = data_loader.main()
 
-        self.X_train = self.X_train.astype('float32')
-        self.X_test = self.X_test.astype('float32')
-        self.X_train /= 255.0
-        self.X_test /= 255.0
-
-        self.y_train = to_categorical(self.y_train, num_classes=10)
-        self.y_test = to_categorical(self.y_test, num_classes=10)
+        self.X = self.X.astype('float32')
+        self.X /= 255.0
 
     def make_model_from_pre_trained(self, pre_trained_model_path):
         with open(pre_trained_model_path + ".json", "rt")as f:
