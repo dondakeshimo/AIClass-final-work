@@ -15,6 +15,7 @@ from keras.layers import MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import model_from_json
 from keras.models import Sequential
+from keras.utils.np_utils import to_categorical
 from keras.utils import plot_model
 
 import data_loader
@@ -30,6 +31,8 @@ class Foreigner_classifier():
 
         self.X = self.X.astype('float32')
         self.X /= 255.0
+
+        self.y = to_categorical(self.y, num_classes=2)
 
         self.X_train, self.X_test, self.y_train, self.y_test = \
             train_test_split(self.X, self.y, test_size=0.2, random_state=0)
@@ -67,11 +70,11 @@ class Foreigner_classifier():
 
         self.model.add(Flatten())
         self.model.add(Dense(256))
-        self.model.add(Dropout(0.25))
+        self.model.add(Dropout(0.5))
         self.model.add(Dense(256))
-        self.model.add(Dropout(0.25))
+        self.model.add(Dropout(0.5))
 
-        self.model.add(Dense(10))
+        self.model.add(Dense(2))
         self.model.add(Activation('softmax'))
 
         self.model.compile(loss='categorical_crossentropy',
@@ -79,11 +82,11 @@ class Foreigner_classifier():
                            metrics=['accuracy'])
 
     def train_model(self):
-        self.model.fit(self.X_train,
-                       self.dtrain.target.values,
-                       epochs=EPOCHS,
-                       batch_size=BATCH_SIZE,
-                       verbose=1)
+        self.history = self.model.fit(self.X_train,
+                                      self.y_train,
+                                      epochs=EPOCHS,
+                                      batch_size=BATCH_SIZE,
+                                      verbose=1)
 
     def evaluate(self):
         loss, acc = self.model.evaluate(self.X_test, self.y_test, verbose=0)
