@@ -23,3 +23,12 @@ img[0].shape
 np.array(img).shape
 
 ant
+
+with open("data/prefecture.txt", "rt") as f:
+    prefecture = f.read()
+
+prefecture = prefecture.split("\n")
+prefecture
+
+ant_bin = [0 if i in prefecture else 1 for i in ant]
+ant_bin
