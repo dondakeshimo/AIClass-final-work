@@ -1,4 +1,5 @@
 import argparse
+from sklearn.model_selection import train_test_split
 from termcolor import cprint
 import time
 
@@ -29,6 +30,9 @@ class Foreigner_classifier():
 
         self.X = self.X.astype('float32')
         self.X /= 255.0
+
+        self.X_train, self.X_test, self.y_train, self.y_test = \
+            train_test_split(self.X, self.y, test_size=0.2, random_state=0)
 
     def make_model_from_pre_trained(self, pre_trained_model_path):
         with open(pre_trained_model_path + ".json", "rt")as f:
@@ -136,7 +140,7 @@ def time_measure(section, start, elapsed):
 def main():
     args = argparser()
     print(args)
-    cifar = Cifar_classifier(args.input_dir_path)
+    cifar = Foreigner_classifier(args.input_dir_path)
     cifar.make_model()
     plot_model(cifar.model, to_file="./data/model.png", show_shapes=True)
     cifar.train_model()
