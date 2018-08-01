@@ -1,5 +1,7 @@
 import argparse
+import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 from sklearn.model_selection import train_test_split
 from termcolor import cprint
 import time
@@ -31,17 +33,19 @@ class Foreigner_classifier():
     def __init__(self, data_dir):
         self.X, self.y = data_loader.main(data_dir)
 
-        self.X = self.X.astype('float32')
-        self.X /= 255.0
-
         self.y = to_categorical(self.y, num_classes=2)
 
-        self.X_train, self.X_test, self.y_train, self.y_test = \
+        self.X_train_org, self.X_test_org, self.y_train, self.y_test = \
             train_test_split(self.X, self.y, test_size=0.2, random_state=0)
 
         self.normalize_image()
 
     def normalize_image(self):
+        self.X_train = self.X_train_org.astype('float32')
+        self.X_test = self.X_test_org.astype('float32')
+        self.X_train /= 255.0
+        self.X_test /= 255.0
+
         mean = np.mean(self.X_train, axis=(0, 1, 2, 3))
         std = np.std(self.X_train, axis=(0, 1, 2, 3))
         self.X_train = (self.X_train - mean) / (std + 1e-7)
@@ -113,6 +117,34 @@ class Foreigner_classifier():
         cprint('Test loss:' + str(loss), "green")
         cprint('Test acc :' + str(acc), "green")
 
+    def show_error_detail(self):
+        self.make_error_mask()
+        self.count_error()
+        cprint("Total test   :" + str(self.error_dict["total_test"]), "cyan")
+        cprint("Total error  :" + str(self.error_dict["total_err"]), "cyan")
+        cprint("Err Japanese :" + str(self.error_dict["Japanese"]), "cyan")
+        cprint("Err foreigner:" + str(self.error_dict["foreigner"]), "cyan")
+
+    def make_error_mask(self):
+        pred = self.model.predict(self.X_test)
+        pred = (pred > 0.5) * 1.0
+        mask = (pred == self.y_test)
+        self.mask = ~mask[:, 0]
+
+    def count_error(self):
+        cnt = np.sum(self.y_test[self.mask], axis=0)
+        self.error_dict = {}
+        self.error_dict["Japanese"] = int(cnt[0])
+        self.error_dict["foreigner"] = int(cnt[1])
+        self.error_dict["total_err"] = len(self.y_test[self.mask])
+        self.error_dict["total_test"] = len(self.y_test)
+
+    def save_error_image(self, err_dir):
+        images = self.X_test_org[self.mask]
+        for i in range(len(images)):
+            im = Image.fromarray(images[i])
+            im.save(err_dir + str(i) + ".jpg")
+
     def save_model(self, checkpoint_path):
         self.model.save_weights(checkpoint_path + ".h5")
         with open(checkpoint_path + ".json", "w") as f:
@@ -156,6 +188,22 @@ def time_measure(section, start, elapsed):
     return elapsed
 
 
+def plot_history(history):
+    plt.plot(history.history['acc'], "o-", label="accuracy")
+    plt.title('model accuracy')
+    plt.xlabel('epoch')
+    plt.ylabel('accuracy')
+    plt.legend(loc="lower right")
+    plt.show()
+
+    plt.plot(history.history['loss'], "o-", label="loss",)
+    plt.title('model loss')
+    plt.xlabel('epoch')
+    plt.ylabel('loss')
+    plt.legend(loc='lower right')
+    plt.show()
+
+
 def main():
     args = argparser()
     print(args)
@@ -167,6 +215,7 @@ def main():
     foreign_clf.train_aug_img_model()
     foreign_clf.save_model(args.checkpoint_path)
     foreign_clf.evaluate()
+    foreign_clf.show_error_detail()
     K.clear_session()
 
 
