@@ -16,6 +16,7 @@ from keras.layers import MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import model_from_json
 from keras.models import Sequential
+from keras.preprocessing.image import ImageDataGenerator
 from keras.utils.np_utils import to_categorical
 from keras.utils import plot_model
 
@@ -97,6 +98,16 @@ class Foreigner_classifier():
                                       batch_size=BATCH_SIZE,
                                       verbose=1)
 
+    def train_aug_img_model(self):
+        datagen = ImageDataGenerator(width_shift_range=0.2,
+                                     height_shift_range=0.2,
+                                     horizontal_flip=True)
+
+        self.history = self.model.fit_generator(
+            datagen.flow(self.X_train, self.y_train, BATCH_SIZE),
+            steps_per_epoch=len(self.X_train) // BATCH_SIZE,
+            epochs=EPOCHS)
+
     def evaluate(self):
         loss, acc = self.model.evaluate(self.X_test, self.y_test, verbose=0)
         cprint('Test loss:' + str(loss), "green")
@@ -130,13 +141,9 @@ def argparser():
                         nargs="?",
                         help="to load checkpoint h5 file path")
     parser.add_argument("-c", "--checkpoint_path",
-                        default="./data/model",
+                        default="../data/model",
                         nargs="?",
                         help="checkpoint h5 file path")
-    parser.add_argument("-s", "--submission_path",
-                        default="./data/NNsubmission.csv",
-                        nargs="?",
-                        help="csv file path for submission")
     return parser.parse_args()
 
 
@@ -154,8 +161,10 @@ def main():
     print(args)
     foreign_clf = Foreigner_classifier(args.input_dir_path)
     foreign_clf.make_model()
-    plot_model(foreign_clf.model, to_file="./data/model.png", show_shapes=True)
-    foreign_clf.train_model()
+    plot_model(foreign_clf.model,
+               to_file="../data/model.png", show_shapes=True)
+    # foreign_clf.train_model()
+    foreign_clf.train_aug_img_model()
     foreign_clf.save_model(args.checkpoint_path)
     foreign_clf.evaluate()
     K.clear_session()
