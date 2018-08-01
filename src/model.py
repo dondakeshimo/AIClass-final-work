@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 from sklearn.model_selection import train_test_split
 from termcolor import cprint
 import time
@@ -36,6 +37,14 @@ class Foreigner_classifier():
 
         self.X_train, self.X_test, self.y_train, self.y_test = \
             train_test_split(self.X, self.y, test_size=0.2, random_state=0)
+
+        self.normalize_image()
+
+    def normalize_image(self):
+        mean = np.mean(self.X_train, axis=(0, 1, 2, 3))
+        std = np.std(self.X_train, axis=(0, 1, 2, 3))
+        self.X_train = (self.X_train - mean) / (std + 1e-7)
+        self.X_test = (self.X_test - mean) / (std + 1e-7)
 
     def make_model_from_pre_trained(self, pre_trained_model_path):
         with open(pre_trained_model_path + ".json", "rt")as f:
@@ -113,7 +122,7 @@ def argparser():
                         nargs="?",
                         help="train or predict")
     parser.add_argument("-i", "--input_dir_path",
-                        default="./data/",
+                        default="../data/",
                         nargs="?",
                         help="input data path")
     parser.add_argument("-p", "--pre_trained_model_path",
