@@ -22,7 +22,7 @@ from keras.utils.np_utils import to_categorical
 import data_loader
 
 
-EPOCHS = 10
+EPOCHS = 50
 BATCH_SIZE = 16
 
 
