@@ -66,6 +66,7 @@ def main():
     foreign_clf.save_model(args.checkpoint_path)
     foreign_clf.evaluate()
     foreign_clf.show_error_detail()
+    plot_history(foreign_clf.history, "data/history/")
     foreign_clf.save_error_image("../data/err_images/")
     K.clear_session()
 
