@@ -11,7 +11,7 @@ from keras.layers import Conv2D
 from keras.layers import Dropout
 # from keras.layers import Flatten
 from keras.layers import GlobalAveragePooling2D
-# from keras.layers import MaxPooling2D
+from keras.layers import MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import model_from_json
 from keras.models import Sequential
@@ -84,7 +84,7 @@ class Foreigner_classifier():
                               activation="relu"))
         self.model.add(Conv2D(filters=32, kernel_size=3, padding="valid",
                               activation="relu"))
-        # self.model.add(MaxPooling2D(pool_size=2))
+        self.model.add(MaxPooling2D(pool_size=2))
         self.model.add(Dropout(0.5))
 
         self.model.add(Conv2D(filters=32, kernel_size=3, padding="valid",

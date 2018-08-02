@@ -64,6 +64,7 @@ def main():
     print(args)
     foreign_clf = Foreigner_classifier(args.input_dir_path)
     foreign_clf.make_model()
+    # foreign_clf.make_model_from_pre_trained("../data/model")
     plot_model(foreign_clf.model,
                to_file="../data/model.png", show_shapes=True)
     foreign_clf.train_aug_img_model()
