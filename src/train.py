@@ -41,18 +41,22 @@ def time_measure(section, start, elapsed):
 
 def plot_history(history, dir):
     plt.plot(history.history['acc'], "o-", label="accuracy")
+    plt.plot(history.history['val_acc'], "o-", label="accuracy")
     plt.title('model accuracy')
     plt.xlabel('epoch')
     plt.ylabel('accuracy')
     plt.legend(loc="lower right")
     plt.savefig(dir + "acc.png")
+    plt.show()
 
     plt.plot(history.history['loss'], "o-", label="loss",)
+    plt.plot(history.history['val_loss'], "o-", label="loss",)
     plt.title('model loss')
     plt.xlabel('epoch')
     plt.ylabel('loss')
     plt.legend(loc='lower right')
     plt.savefig(dir + "loss.png")
+    plt.show()
 
 
 def main():
