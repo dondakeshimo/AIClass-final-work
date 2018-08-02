@@ -7,9 +7,10 @@ from keras.callbacks import EarlyStopping
 from keras.callbacks import ModelCheckpoint
 from keras.layers import Activation
 from keras.layers import Conv2D
-from keras.layers import Dense
+# from keras.layers import Dense
 from keras.layers import Dropout
-from keras.layers import Flatten
+# from keras.layers import Flatten
+from keras.layers import GlobalAveragePooling2D
 from keras.layers import MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import model_from_json
@@ -61,13 +62,13 @@ class Foreigner_classifier():
         self.model.add(Conv2D(filters=16, kernel_size=3, padding="same",
                               activation="relu",
                               input_shape=self.X_train.shape[1:]))
-        self.model.add(BatchNormalization())
         self.model.add(MaxPooling2D(pool_size=2))
+        self.model.add(BatchNormalization())
 
         self.model.add(Conv2D(filters=32, kernel_size=3, padding="same",
                               activation="relu"))
-        self.model.add(BatchNormalization())
         self.model.add(MaxPooling2D(pool_size=2))
+        self.model.add(BatchNormalization())
         self.model.add(Dropout(0.5))
 
         self.model.add(Conv2D(filters=64, kernel_size=2, padding="same",
@@ -79,13 +80,15 @@ class Foreigner_classifier():
         self.model.add(MaxPooling2D(pool_size=2))
         self.model.add(Dropout(0.5))
 
-        self.model.add(Flatten())
-        self.model.add(Dense(256))
-        self.model.add(Dropout(0.5))
-        self.model.add(Dense(256))
+        self.model.add(Conv2D(filters=32, kernel_size=2, padding="same",
+                              activation="relu"))
+        self.model.add(Conv2D(filters=32, kernel_size=2, padding="same",
+                              activation="relu"))
+        self.model.add(Conv2D(filters=2, kernel_size=2, padding="same",
+                              activation="relu"))
         self.model.add(Dropout(0.5))
 
-        self.model.add(Dense(2))
+        self.model.add(GlobalAveragePooling2D())
         self.model.add(Activation('softmax'))
 
         self.model.compile(loss='categorical_crossentropy',
