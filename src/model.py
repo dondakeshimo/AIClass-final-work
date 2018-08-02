@@ -25,7 +25,7 @@ from keras.utils import plot_model
 import data_loader
 
 
-EPOCHS = 10
+EPOCHS = 100
 BATCH_SIZE = 16
 
 
@@ -73,6 +73,7 @@ class Foreigner_classifier():
                               activation="relu"))
         self.model.add(BatchNormalization())
         self.model.add(MaxPooling2D(pool_size=2))
+        self.model.add(Dropout(0.5))
 
         self.model.add(Conv2D(filters=64, kernel_size=2, padding="same",
                               activation="relu"))
@@ -81,6 +82,7 @@ class Foreigner_classifier():
         self.model.add(Conv2D(filters=32, kernel_size=2, padding="same",
                               activation="relu"))
         self.model.add(MaxPooling2D(pool_size=2))
+        self.model.add(Dropout(0.5))
 
         self.model.add(Flatten())
         self.model.add(Dense(256))
@@ -216,6 +218,7 @@ def main():
     foreign_clf.save_model(args.checkpoint_path)
     foreign_clf.evaluate()
     foreign_clf.show_error_detail()
+    foreign_clf.save_error_image("../data/err_images/")
     K.clear_session()
 
 
