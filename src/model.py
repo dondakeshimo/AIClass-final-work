@@ -11,7 +11,7 @@ from keras.layers import Conv2D
 from keras.layers import Dropout
 # from keras.layers import Flatten
 from keras.layers import GlobalAveragePooling2D
-from keras.layers import MaxPooling2D
+# from keras.layers import MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import model_from_json
 from keras.models import Sequential
@@ -21,7 +21,7 @@ from keras.utils.np_utils import to_categorical
 import data_loader
 
 
-EPOCHS = 20
+EPOCHS = 30
 BATCH_SIZE = 16
 
 
@@ -59,33 +59,34 @@ class Foreigner_classifier():
     def make_model(self, pre_trained_model_path=None):
         self.model = Sequential()
 
-        self.model.add(Conv2D(filters=16, kernel_size=3, padding="same",
+        self.model.add(Conv2D(filters=16, kernel_size=3, padding="valid",
                               activation="relu",
                               input_shape=self.X_train.shape[1:]))
-        self.model.add(MaxPooling2D(pool_size=2))
+        # self.model.add(MaxPooling2D(pool_size=2))
         self.model.add(BatchNormalization())
 
-        self.model.add(Conv2D(filters=32, kernel_size=3, padding="same",
+        self.model.add(Conv2D(filters=32, kernel_size=3, padding="valid",
                               activation="relu"))
-        self.model.add(MaxPooling2D(pool_size=2))
+        # self.model.add(MaxPooling2D(pool_size=2))
         self.model.add(BatchNormalization())
         self.model.add(Dropout(0.5))
 
-        self.model.add(Conv2D(filters=64, kernel_size=2, padding="same",
+        self.model.add(Conv2D(filters=64, kernel_size=3, padding="valid",
                               activation="relu"))
-        self.model.add(Conv2D(filters=64, kernel_size=2, padding="same",
+        self.model.add(Conv2D(filters=64, kernel_size=3, padding="valid",
                               activation="relu"))
-        self.model.add(Conv2D(filters=32, kernel_size=2, padding="same",
+        self.model.add(Conv2D(filters=32, kernel_size=3, padding="valid",
                               activation="relu"))
-        self.model.add(MaxPooling2D(pool_size=2))
+        # self.model.add(MaxPooling2D(pool_size=2))
         self.model.add(Dropout(0.5))
 
-        self.model.add(Conv2D(filters=32, kernel_size=2, padding="same",
+        self.model.add(Conv2D(filters=32, kernel_size=3, padding="valid",
                               activation="relu"))
-        self.model.add(Conv2D(filters=32, kernel_size=2, padding="same",
+        self.model.add(Conv2D(filters=32, kernel_size=3, padding="valid",
                               activation="relu"))
-        self.model.add(Conv2D(filters=2, kernel_size=2, padding="same",
+        self.model.add(Conv2D(filters=2, kernel_size=3, padding="valid",
                               activation="relu"))
+        self.model.add(BatchNormalization())
         self.model.add(Dropout(0.5))
 
         self.model.add(GlobalAveragePooling2D())
