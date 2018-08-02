@@ -9,10 +9,6 @@ from keras.utils import plot_model
 from model import Foreigner_classifier
 
 
-EPOCHS = 100
-BATCH_SIZE = 16
-
-
 def argparser():
     parser = argparse.ArgumentParser(description='This script is ...')
     parser.add_argument("-m", "--mode",
@@ -43,20 +39,20 @@ def time_measure(section, start, elapsed):
     return elapsed
 
 
-def plot_history(history):
+def plot_history(history, dir):
     plt.plot(history.history['acc'], "o-", label="accuracy")
     plt.title('model accuracy')
     plt.xlabel('epoch')
     plt.ylabel('accuracy')
     plt.legend(loc="lower right")
-    plt.show()
+    plt.savefig(dir + "acc.png")
 
     plt.plot(history.history['loss'], "o-", label="loss",)
     plt.title('model loss')
     plt.xlabel('epoch')
     plt.ylabel('loss')
     plt.legend(loc='lower right')
-    plt.show()
+    plt.savefig(dir + "loss.png")
 
 
 def main():
