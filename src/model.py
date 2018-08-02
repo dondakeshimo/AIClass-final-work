@@ -3,6 +3,7 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 from termcolor import cprint
 
+from keras import backend as K
 from keras.callbacks import EarlyStopping
 from keras.callbacks import ModelCheckpoint
 from keras.layers import Activation
@@ -21,7 +22,7 @@ from keras.utils.np_utils import to_categorical
 import data_loader
 
 
-EPOCHS = 30
+EPOCHS = 10
 BATCH_SIZE = 16
 
 
@@ -100,7 +101,7 @@ class Foreigner_classifier():
         self.model.add(Activation('softmax'))
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer='adam',
+                           optimizer=lean_weight_loss,
                            metrics=['accuracy'])
 
     def train_model(self):
@@ -168,6 +169,13 @@ def get_callbacks(checkpoint_path, patience=2):
     es = EarlyStopping('val_loss', patience=patience, mode="min")
     msave = ModelCheckpoint(checkpoint_path, save_best_only=True)
     return [es, msave]
+
+
+# this function raise error
+def lean_weight_loss(y_true, y_pred):
+    loss_jpn = y_true[:, 0] * K.log(y_pred[:, 0])
+    loss_frn = y_true[:, 1] * K.log(y_pred[:, 1])
+    return loss_jpn + loss_frn * 10
 
 
 def main():
