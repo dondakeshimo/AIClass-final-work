@@ -41,9 +41,9 @@ class Foreigner_classifier():
         self.normalize_image()
 
     def normalize_image(self):
-        self.X_train = self.X_train_org.astype('float32')
-        self.X_test = self.X_test_org.astype('float32')
-        self.X_val = self.X_val_org.astype('float32')
+        self.X_train = self.X_train_org.astype("float32")
+        self.X_test = self.X_test_org.astype("float32")
+        self.X_val = self.X_val_org.astype("float32")
 
         self.X_train /= 255.0
         self.X_test /= 255.0
@@ -59,9 +59,9 @@ class Foreigner_classifier():
         with open(pre_trained_model_path + ".json", "rt")as f:
             json_model = f.read()
         self.model = model_from_json(json_model)
-        self.model.compile(loss='categorical_crossentropy',
-                           optimizer='adam',
-                           metrics=['accuracy'])
+        self.model.compile(loss="categorical_crossentropy",
+                           optimizer="adam",
+                           metrics=["accuracy"])
         self.model.load_weights(pre_trained_model_path + ".h5")
 
     def make_model(self, pre_trained_model_path=None):
@@ -98,11 +98,11 @@ class Foreigner_classifier():
         self.model.add(Dropout(0.5))
 
         self.model.add(GlobalAveragePooling2D())
-        self.model.add(Activation('softmax'))
+        self.model.add(Activation("softmax"))
 
-        self.model.compile(loss='categorical_crossentropy',
-                           optimizer=lean_weight_loss,
-                           metrics=['accuracy'])
+        self.model.compile(loss="categorical_crossentropy",
+                           optimizer="adam",
+                           metrics=["accuracy"])
 
     def train_model(self):
         self.history = self.model.fit(self.X_train,
@@ -127,8 +127,8 @@ class Foreigner_classifier():
 
     def evaluate(self):
         loss, acc = self.model.evaluate(self.X_test, self.y_test, verbose=0)
-        cprint('Test loss:' + str(loss), "green")
-        cprint('Test acc :' + str(acc), "green")
+        cprint("Test loss:" + str(loss), "green")
+        cprint("Test acc :" + str(acc), "green")
 
     def show_error_detail(self):
         self.make_error_mask()
@@ -166,7 +166,7 @@ class Foreigner_classifier():
 
 # no use
 def get_callbacks(checkpoint_path, patience=2):
-    es = EarlyStopping('val_loss', patience=patience, mode="min")
+    es = EarlyStopping("val_loss", patience=patience, mode="min")
     msave = ModelCheckpoint(checkpoint_path, save_best_only=True)
     return [es, msave]
 

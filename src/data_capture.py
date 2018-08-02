@@ -17,7 +17,7 @@ def make_url(team):
 
 def get_players(url):
     driver.get(url)
-    html = driver.page_source.encode('utf-8')
+    html = driver.page_source.encode("utf-8")
     soup = BeautifulSoup(html, "lxml")
 
     player_table = soup.find("table", class_="playerDataTable")
