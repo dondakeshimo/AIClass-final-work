@@ -34,18 +34,25 @@ class Foreigner_classifier():
         self.X_train_org, self.X_test_org, self.y_train, self.y_test = \
             train_test_split(self.X, self.y, test_size=0.2, random_state=0)
 
+        self.X_train_org, self.X_val_org, self.y_train, self.y_val = \
+            train_test_split(self.X, self.y, test_size=0.1, random_state=0)
+
         self.normalize_image()
 
     def normalize_image(self):
         self.X_train = self.X_train_org.astype('float32')
         self.X_test = self.X_test_org.astype('float32')
+        self.X_val = self.X_val_org.astype('float32')
+
         self.X_train /= 255.0
         self.X_test /= 255.0
+        self.X_val /= 255.0
 
         mean = np.mean(self.X_train, axis=(0, 1, 2, 3))
         std = np.std(self.X_train, axis=(0, 1, 2, 3))
         self.X_train = (self.X_train - mean) / (std + 1e-7)
         self.X_test = (self.X_test - mean) / (std + 1e-7)
+        self.X_val = (self.X_val - mean) / (std + 1e-7)
 
     def make_model_from_pre_trained(self, pre_trained_model_path):
         with open(pre_trained_model_path + ".json", "rt")as f:
@@ -104,14 +111,18 @@ class Foreigner_classifier():
                                       verbose=1)
 
     def train_aug_img_model(self):
-        datagen = ImageDataGenerator(width_shift_range=0.2,
-                                     height_shift_range=0.2,
-                                     horizontal_flip=True)
+        train_gen = ImageDataGenerator(width_shift_range=0.2,
+                                       height_shift_range=0.2,
+                                       horizontal_flip=True)
+
+        val_gen = ImageDataGenerator()
 
         self.history = self.model.fit_generator(
-            datagen.flow(self.X_train, self.y_train, BATCH_SIZE),
+            train_gen.flow(self.X_train, self.y_train, BATCH_SIZE),
             steps_per_epoch=len(self.X_train) // BATCH_SIZE,
-            epochs=EPOCHS)
+            epochs=EPOCHS,
+            validation_data=val_gen.flow(self.X_val, self.y_val, BATCH_SIZE),
+            validation_steps=len(self.X_val) // BATCH_SIZE)
 
     def evaluate(self):
         loss, acc = self.model.evaluate(self.X_test, self.y_test, verbose=0)
