@@ -22,9 +22,9 @@ from keras.utils.np_utils import to_categorical
 import data_loader
 
 
-EPOCHS = 50
+EPOCHS = 120
 BATCH_SIZE = 16
-PENALTY = 100
+PENALTY = 6
 
 
 class Foreigner_classifier():
@@ -60,8 +60,8 @@ class Foreigner_classifier():
         with open(pre_trained_model_path + ".json", "rt")as f:
             json_model = f.read()
         self.model = model_from_json(json_model)
-        self.model.compile(loss="categorical_crossentropy",
-                           optimizer=lean_weight_loss,
+        self.model.compile(loss=lean_weight_loss,
+                           optimizer="adam",
                            metrics=["accuracy"])
         self.model.load_weights(pre_trained_model_path + ".h5")
 
@@ -101,7 +101,7 @@ class Foreigner_classifier():
         self.model.add(GlobalAveragePooling2D())
         self.model.add(Activation("softmax"))
 
-        self.model.compile(loss="categorical_crossentropy",
+        self.model.compile(loss=lean_weight_loss,
                            optimizer="adam",
                            metrics=["accuracy"])
 
