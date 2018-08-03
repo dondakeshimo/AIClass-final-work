@@ -24,6 +24,7 @@ import data_loader
 
 EPOCHS = 50
 BATCH_SIZE = 16
+PENALTY = 100
 
 
 class Foreigner_classifier():
@@ -60,7 +61,7 @@ class Foreigner_classifier():
             json_model = f.read()
         self.model = model_from_json(json_model)
         self.model.compile(loss="categorical_crossentropy",
-                           optimizer="adam",
+                           optimizer=lean_weight_loss,
                            metrics=["accuracy"])
         self.model.load_weights(pre_trained_model_path + ".h5")
 
@@ -175,7 +176,7 @@ def get_callbacks(checkpoint_path, patience=2):
 def lean_weight_loss(y_true, y_pred):
     loss_jpn = y_true[:, 0] * K.log(y_pred[:, 0])
     loss_frn = y_true[:, 1] * K.log(y_pred[:, 1])
-    return loss_jpn + loss_frn * 10
+    return -K.sum(loss_jpn + loss_frn * PENALTY)
 
 
 def main():
